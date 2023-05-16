@@ -22,18 +22,18 @@ class GildedRose:
 
     def update_quality(self):
         for item in self.items:
-            # special cases, Brie, Backstage Passes, Sulfuras
-            if item.name == "Aged Brie" or item.name == "Backstage passes to a TAFKAL80ETC concert":
+            if item.name == "Aged Brie":
                 if item.quality < 50:
                     item.quality = item.quality + 1
-                    if item.name == "Backstage passes to a TAFKAL80ETC concert":
-                        if item.sell_in < 11:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
-                        if item.sell_in < 6:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
-            # normal items
+            elif item.name == "Backstage passes to a TAFKAL80ETC concert":
+                if item.quality < 50:
+                    item.quality = item.quality + 1
+                    if item.sell_in < 11:
+                        if item.quality < 50:
+                            item.quality = item.quality + 1
+                    if item.sell_in < 6:
+                        if item.quality < 50:
+                            item.quality = item.quality + 1
             else:
                 if item.quality > 0:
                     if item.name != "Sulfuras, Hand of Ragnaros":
