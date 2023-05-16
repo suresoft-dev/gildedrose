@@ -1,0 +1,9 @@
+
+[project]
+name = "gildedrose-kata"
+version = "1.0.0"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+    "pytest>=7.3.1",
+]
