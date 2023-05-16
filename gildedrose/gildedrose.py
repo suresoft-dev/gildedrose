@@ -22,6 +22,7 @@ class GildedRose:
 
     def update_quality(self):
         for item in self.items:
+
             if item.name == "Aged Brie":
                 if item.quality < 50:
                     item.quality = item.quality + 1
@@ -34,10 +35,11 @@ class GildedRose:
                     if item.sell_in < 6:
                         if item.quality < 50:
                             item.quality = item.quality + 1
+            elif item.name == "Sulfuras, Hand of Ragnaros":
+                item.quality = item.quality
             else:
                 if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
+                    item.quality = item.quality - 1
 
             # reduce sell in
             if item.name != "Sulfuras, Hand of Ragnaros":
@@ -47,13 +49,15 @@ class GildedRose:
                 if item.name == "Aged Brie":
                     if item.quality < 50:
                         item.quality = item.quality + 1
+                elif item.name == "Sulfuras, Hand of Ragnaros":
+                    item.quality == item.quality
                 else:
                     if item.name != "Backstage passes to a TAFKAL80ETC concert":
                         if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
+                            item.quality = item.quality - 1
                     else:
                         item.quality = item.quality - item.quality
+
 
 class Item:
     def __init__(self, name: str, sell_in: int, quality: int):
