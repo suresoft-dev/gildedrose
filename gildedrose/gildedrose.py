@@ -22,14 +22,8 @@ class GildedRose:
 
     def update_quality(self):
         for item in self.items:
-            # normal items
-            if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
-            
             # special cases, Brie, Backstage Passes, Sulfuras
-            else:
+            if item.name == "Aged Brie" or item.name == "Backstage passes to a TAFKAL80ETC concert":
                 if item.quality < 50:
                     item.quality = item.quality + 1
                     if item.name == "Backstage passes to a TAFKAL80ETC concert":
@@ -39,27 +33,27 @@ class GildedRose:
                         if item.sell_in < 6:
                             if item.quality < 50:
                                 item.quality = item.quality + 1
+            # normal items
+            else:
+                if item.quality > 0:
+                    if item.name != "Sulfuras, Hand of Ragnaros":
+                        item.quality = item.quality - 1
 
             # reduce sell in
             if item.name != "Sulfuras, Hand of Ragnaros":
                 item.sell_in = item.sell_in - 1
-
             
             if item.sell_in < 0:
-                # everything that is not aged brie
-                if item.name != "Aged Brie":
+                if item.name == "Aged Brie":
+                    if item.quality < 50:
+                        item.quality = item.quality + 1
+                else:
                     if item.name != "Backstage passes to a TAFKAL80ETC concert":
                         if item.quality > 0:
                             if item.name != "Sulfuras, Hand of Ragnaros":
                                 item.quality = item.quality - 1
                     else:
                         item.quality = item.quality - item.quality
-                
-                # aged brie
-                else:
-                    if item.quality < 50:
-                        item.quality = item.quality + 1
-
 
 class Item:
     def __init__(self, name: str, sell_in: int, quality: int):
