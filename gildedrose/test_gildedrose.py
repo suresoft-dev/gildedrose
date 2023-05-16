@@ -29,7 +29,7 @@ def test_gildedrose_regression_test() -> None:
         Item(name="Conjured Mana Cake", sell_in=3, quality=6),
     ]
 
-    actual = run_gildedrose(days=2, items=items)
+    actual = run_gildedrose(days=20, items=items)
 
     expected = read_reference()
     assert expected == actual
