@@ -27,9 +27,14 @@ class GildedRose:
                 item.sell_in = item.sell_in - 1
 
             if item.name == "Aged Brie":
-                quality_change = 1
+                if item.sell_in < 0:
+                    quality_change = 2
+                else:
+                    quality_change = 1
             elif item.name == "Backstage passes to a TAFKAL80ETC concert":
-                if item.sell_in < 5:
+                if item.sell_in < 0:
+                    quality_change = -item.quality
+                elif item.sell_in < 5:
                     quality_change = 3
                 elif item.sell_in < 10:
                     quality_change = 2
@@ -38,21 +43,12 @@ class GildedRose:
             elif item.name == "Sulfuras, Hand of Ragnaros":
                 quality_change = 0
             else:
-                quality_change = -1
-            
-            item.quality += quality_change
-            
-            if item.sell_in < 0:
-                if item.name == "Aged Brie":
-                    quality_change = 1
-                elif item.name == "Backstage passes to a TAFKAL80ETC concert":
-                    quality_change = -item.quality
-                elif item.name == "Sulfuras, Hand of Ragnaros":
-                    quality_change = 0
+                if item.sell_in < 0:
+                    quality_change = -2
                 else:
                     quality_change = -1
-
-                item.quality += quality_change
+            
+            item.quality += quality_change
 
             if item.name != "Sulfuras, Hand of Ragnaros":
                 if item.quality > 50:
