@@ -71,6 +71,22 @@ ITEM_SELL_IN_COUNTDOWN = {
 }
 
 
+def regular_quality_clamp(quality: int) -> int:
+    if quality > 50:
+        quality = 50
+    if quality < 0:
+        quality = 0
+
+    return quality
+
+
+def legendary_quality_clamp(quality: int) -> int:
+    return quality
+
+
+ITEM_QUALITY_CLAMP = {"Sulfuras, Hand of Ragnaros": legendary_quality_clamp}
+
+
 class GildedRose:
     def __init__(self, items: list["Item"]):
         self.items = items
@@ -81,13 +97,10 @@ class GildedRose:
             item.sell_in = countdown(item.sell_in)
 
             decay = ITEM_DECAYS.get(item.name, regular_decay)
-            item.quality += decay(item.quality, item.sell_in)
+            quality_change = decay(item.quality, item.sell_in)
 
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                if item.quality > 50:
-                    item.quality = 50
-                if item.quality < 0:
-                    item.quality = 0
+            clamp = ITEM_QUALITY_CLAMP.get(item.name, regular_quality_clamp)
+            item.quality = clamp(item.quality + quality_change)
 
 
 class Item:
