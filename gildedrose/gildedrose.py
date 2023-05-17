@@ -51,6 +51,13 @@ def legendary_decay(current_quality: int, sell_in: int) -> int:
     return 0
 
 
+ITEM_DECAYS = {
+    "Aged Brie": aged_brie_decay,
+    "Backstage passes to a TAFKAL80ETC concert": backstage_passes_decay,
+    "Sulfuras, Hand of Ragnaros": legendary_decay,
+}
+
+
 class GildedRose:
     def __init__(self, items: list["Item"]):
         self.items = items
@@ -61,16 +68,8 @@ class GildedRose:
             if item.name != "Sulfuras, Hand of Ragnaros":
                 item.sell_in = item.sell_in - 1
 
-            if item.name == "Aged Brie":
-                quality_change = aged_brie_decay(item.quality, item.sell_in)
-            elif item.name == "Backstage passes to a TAFKAL80ETC concert":
-                quality_change = backstage_passes_decay(item.quality, item.sell_in)
-            elif item.name == "Sulfuras, Hand of Ragnaros":
-                quality_change = legendary_decay(item.quality, item.sell_in)
-            else:
-                quality_change = regular_decay(item.quality, item.sell_in)
-
-            item.quality += quality_change
+            decay = ITEM_DECAYS.get(item.name, regular_decay)
+            item.quality += decay(item.quality, item.sell_in)
 
             if item.name != "Sulfuras, Hand of Ragnaros":
                 if item.quality > 50:
