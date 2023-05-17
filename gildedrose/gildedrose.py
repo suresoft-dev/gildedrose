@@ -16,80 +16,74 @@ Special Items:
 """
 
 
-from typing import Protocol
+from typing import Callable
+from dataclasses import dataclass
 
 
-class RegularItemPolicy:
-    def countdown(self, sell_in: int) -> int:
-        return sell_in - 1
-
-    def decay(self, current_quality: int, sell_in: int) -> int:
-        if sell_in < 0:
-            quality_change = -2
-        else:
-            quality_change = -1
-
-        return quality_change
-
-    def clamp(self, quality: int) -> int:
-        if quality > 50:
-            quality = 50
-        if quality < 0:
-            quality = 0
-
-        return quality
+def regular_countdown(sell_in: int) -> int:
+    return sell_in - 1
 
 
-class AgedBriePolicy(RegularItemPolicy):
-    def decay(self, current_quality: int, sell_in: int) -> int:
-        if sell_in < 0:
-            quality_change = 2
-        else:
-            quality_change = 1
+def regular_decay(current_quality: int, sell_in: int) -> int:
+    if sell_in < 0:
+        quality_change = -2
+    else:
+        quality_change = -1
 
-        return quality_change
-
-
-class BackStagePassesPolicy(RegularItemPolicy):
-    def decay(self, current_quality: int, sell_in: int) -> int:
-        if sell_in < 0:
-            quality_change = -current_quality
-        elif sell_in < 5:
-            quality_change = 3
-        elif sell_in < 10:
-            quality_change = 2
-        else:
-            quality_change = 1
-
-        return quality_change
+    return quality_change
 
 
-class LegendaryPolicy:
-    def countdown(self, sell_in: int) -> int:
-        return sell_in
+def clamp(quality: int) -> int:
+    if quality > 50:
+        quality = 50
+    if quality < 0:
+        quality = 0
 
-    def decay(self, current_quality: int, sell_in: int) -> int:
-        return 0
-
-    def clamp(self, quality: int) -> int:
-        return quality
+    return quality
 
 
-class ItemPolicy(Protocol):
-    def countdown(self, sell_in: int) -> int:
-        ...
+def aged_brie_decay(current_quality: int, sell_in: int) -> int:
+    if sell_in < 0:
+        quality_change = 2
+    else:
+        quality_change = 1
 
-    def decay(self, current_quality: int, sell_in: int) -> int:
-        ...
+    return quality_change
 
-    def clamp(self, quality: int) -> int:
-        ...
+
+def backstage_pass_decay(current_quality: int, sell_in: int) -> int:
+    if sell_in < 0:
+        quality_change = -current_quality
+    elif sell_in < 5:
+        quality_change = 3
+    elif sell_in < 10:
+        quality_change = 2
+    else:
+        quality_change = 1
+
+    return quality_change
+
+
+Decay = Callable[[int, int], int]
+Countdown = Callable[[int], int]
+Clamp = Callable[[int], int]
+
+
+@dataclass
+class ItemPolicy:
+    decay: Decay = regular_decay
+    countdown: Countdown = regular_countdown
+    clamp: Clamp = clamp
 
 
 ITEM_POLICIES: dict[str, ItemPolicy] = {
-    "Aged Brie": AgedBriePolicy(),
-    "Backstage passes to a TAFKAL80ETC concert": BackStagePassesPolicy(),
-    "Sulfuras, Hand of Ragnaros": LegendaryPolicy(),
+    "Aged Brie": ItemPolicy(decay=aged_brie_decay),
+    "Backstage passes to a TAFKAL80ETC concert": ItemPolicy(decay=backstage_pass_decay),
+    "Sulfuras, Hand of Ragnaros": ItemPolicy(
+        decay=lambda _, __: 0,
+        countdown=lambda s: s,
+        clamp=lambda q: q,
+    ),
 }
 
 
@@ -99,7 +93,7 @@ class GildedRose:
 
     def update_quality(self):
         for item in self.items:
-            policy = ITEM_POLICIES.get(item.name, RegularItemPolicy())
+            policy = ITEM_POLICIES.get(item.name, ItemPolicy())
             sell_in = policy.countdown(item.sell_in)
             quality_change = policy.decay(item.quality, sell_in)
 
