@@ -58,11 +58,7 @@ def backstage_pass_decay(current_quality: int, sell_in: int) -> int:
 
     i = 10
     quality_change = 1
-    if sell_in < i:
-        quality_change += 1
-        i -= 5
-
-    if sell_in < i:
+    while sell_in < i:
         quality_change += 1
         i -= 5
 
