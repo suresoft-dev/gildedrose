@@ -16,75 +16,81 @@ Special Items:
 """
 
 
-def regular_decay(current_quality: int, sell_in: int) -> int:
-    if sell_in < 0:
-        quality_change = -2
-    else:
-        quality_change = -1
-
-    return quality_change
+from typing import Protocol
 
 
-def aged_brie_decay(current_quality: int, sell_in: int) -> int:
-    if sell_in < 0:
-        quality_change = 2
-    else:
-        quality_change = 1
+class RegularItemPolicy:
+    def countdown(self, sell_in: int) -> int:
+        return sell_in - 1
 
-    return quality_change
+    def decay(self, current_quality: int, sell_in: int) -> int:
+        if sell_in < 0:
+            quality_change = -2
+        else:
+            quality_change = -1
 
+        return quality_change
 
-def backstage_passes_decay(current_quality: int, sell_in: int) -> int:
-    if sell_in < 0:
-        quality_change = -current_quality
-    elif sell_in < 5:
-        quality_change = 3
-    elif sell_in < 10:
-        quality_change = 2
-    else:
-        quality_change = 1
+    def clamp(self, quality: int) -> int:
+        if quality > 50:
+            quality = 50
+        if quality < 0:
+            quality = 0
 
-    return quality_change
-
-
-def legendary_decay(current_quality: int, sell_in: int) -> int:
-    return 0
+        return quality
 
 
-ITEM_DECAYS = {
-    "Aged Brie": aged_brie_decay,
-    "Backstage passes to a TAFKAL80ETC concert": backstage_passes_decay,
-    "Sulfuras, Hand of Ragnaros": legendary_decay,
+class AgedBriePolicy(RegularItemPolicy):
+    def decay(self, current_quality: int, sell_in: int) -> int:
+        if sell_in < 0:
+            quality_change = 2
+        else:
+            quality_change = 1
+
+        return quality_change
+
+
+class BackStagePassesPolicy(RegularItemPolicy):
+    def decay(self, current_quality: int, sell_in: int) -> int:
+        if sell_in < 0:
+            quality_change = -current_quality
+        elif sell_in < 5:
+            quality_change = 3
+        elif sell_in < 10:
+            quality_change = 2
+        else:
+            quality_change = 1
+
+        return quality_change
+
+
+class LegendaryPolicy:
+    def countdown(self, sell_in: int) -> int:
+        return sell_in
+
+    def decay(self, current_quality: int, sell_in: int) -> int:
+        return 0
+
+    def clamp(self, quality: int) -> int:
+        return quality
+
+
+class ItemPolicy(Protocol):
+    def countdown(self, sell_in: int) -> int:
+        ...
+
+    def decay(self, current_quality: int, sell_in: int) -> int:
+        ...
+
+    def clamp(self, quality: int) -> int:
+        ...
+
+
+ITEM_POLICIES: dict[str, ItemPolicy] = {
+    "Aged Brie": AgedBriePolicy(),
+    "Backstage passes to a TAFKAL80ETC concert": BackStagePassesPolicy(),
+    "Sulfuras, Hand of Ragnaros": LegendaryPolicy(),
 }
-
-
-def regular_sell_in_countdown(current_sell_in: int) -> int:
-    return current_sell_in - 1
-
-
-def legendary_sell_in_countdown(current_sell_in: int) -> int:
-    return current_sell_in
-
-
-ITEM_SELL_IN_COUNTDOWN = {
-    "Sulfuras, Hand of Ragnaros": legendary_sell_in_countdown,
-}
-
-
-def regular_quality_clamp(quality: int) -> int:
-    if quality > 50:
-        quality = 50
-    if quality < 0:
-        quality = 0
-
-    return quality
-
-
-def legendary_quality_clamp(quality: int) -> int:
-    return quality
-
-
-ITEM_QUALITY_CLAMP = {"Sulfuras, Hand of Ragnaros": legendary_quality_clamp}
 
 
 class GildedRose:
@@ -93,14 +99,12 @@ class GildedRose:
 
     def update_quality(self):
         for item in self.items:
-            countdown = ITEM_SELL_IN_COUNTDOWN.get(item.name, regular_sell_in_countdown)
-            item.sell_in = countdown(item.sell_in)
+            policy = ITEM_POLICIES.get(item.name, RegularItemPolicy())
+            sell_in = policy.countdown(item.sell_in)
+            quality_change = policy.decay(item.quality, sell_in)
 
-            decay = ITEM_DECAYS.get(item.name, regular_decay)
-            quality_change = decay(item.quality, item.sell_in)
-
-            clamp = ITEM_QUALITY_CLAMP.get(item.name, regular_quality_clamp)
-            item.quality = clamp(item.quality + quality_change)
+            item.sell_in = sell_in
+            item.quality = policy.clamp(item.quality + quality_change)
 
 
 class Item:
