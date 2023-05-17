@@ -16,7 +16,7 @@ Special Items:
 """
 
 
-def regular_decay(sell_in: int) -> int:
+def regular_decay(current_quality: int, sell_in: int) -> int:
     if sell_in < 0:
         quality_change = -2
     else:
@@ -25,7 +25,7 @@ def regular_decay(sell_in: int) -> int:
     return quality_change
 
 
-def aged_brie_decay(sell_in: int) -> int:
+def aged_brie_decay(current_quality: int, sell_in: int) -> int:
     if sell_in < 0:
         quality_change = 2
     else:
@@ -47,7 +47,7 @@ def backstage_passes_decay(current_quality: int, sell_in: int) -> int:
     return quality_change
 
 
-def legendary_decay() -> int:
+def legendary_decay(current_quality: int, sell_in: int) -> int:
     return 0
 
 
@@ -62,13 +62,13 @@ class GildedRose:
                 item.sell_in = item.sell_in - 1
 
             if item.name == "Aged Brie":
-                quality_change = aged_brie_decay(item.sell_in)
+                quality_change = aged_brie_decay(item.quality, item.sell_in)
             elif item.name == "Backstage passes to a TAFKAL80ETC concert":
                 quality_change = backstage_passes_decay(item.quality, item.sell_in)
             elif item.name == "Sulfuras, Hand of Ragnaros":
-                quality_change = legendary_decay()
+                quality_change = legendary_decay(item.quality, item.sell_in)
             else:
-                quality_change = regular_decay(item.sell_in)
+                quality_change = regular_decay(item.quality, item.sell_in)
 
             item.quality += quality_change
 
