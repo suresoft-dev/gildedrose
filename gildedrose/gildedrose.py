@@ -54,13 +54,8 @@ def aged_brie_decay(current_quality: int, sell_in: int) -> int:
 def backstage_pass_decay(current_quality: int, sell_in: int) -> int:
     if sell_in < 0:
         quality_change = -current_quality
-        return quality_change
-
-    i = 10
-    quality_change = 1
-    while sell_in < i:
-        quality_change += 1
-        i -= 5
+    else:
+        quality_change = 1 + sum(1 for _ in range(10, sell_in, -5))
 
     return quality_change
 
