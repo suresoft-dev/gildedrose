@@ -26,7 +26,7 @@ def test_gildedrose_regression_test() -> None:
         Item(name="Backstage passes to a TAFKAL80ETC concert", sell_in=15, quality=20),
         Item(name="Backstage passes to a TAFKAL80ETC concert", sell_in=10, quality=49),
         Item(name="Backstage passes to a TAFKAL80ETC concert", sell_in=5, quality=49),
-        Item(name="Conjured Mana Cake", sell_in=3, quality=6),
+        Item(name="Conjured Mana Cake", sell_in=3, quality=12),
     ]
 
     actual = run_gildedrose(days=20, items=items)
