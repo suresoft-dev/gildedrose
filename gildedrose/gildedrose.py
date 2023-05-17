@@ -93,7 +93,11 @@ class GildedRose:
 
     def update_quality(self):
         for item in self.items:
-            policy = ITEM_POLICIES.get(item.name, ItemPolicy())
+            if "Conjured" in item.name:
+                policy = ItemPolicy(lambda q, s: regular_decay(q, s) * 2)
+            else:
+                policy = ITEM_POLICIES.get(item.name, ItemPolicy())
+
             sell_in = policy.countdown(item.sell_in)
             quality_change = policy.decay(item.quality, sell_in)
 
