@@ -58,15 +58,27 @@ ITEM_DECAYS = {
 }
 
 
+def regular_sell_in_countdown(current_sell_in: int) -> int:
+    return current_sell_in - 1
+
+
+def legendary_sell_in_countdown(current_sell_in: int) -> int:
+    return current_sell_in
+
+
+ITEM_SELL_IN_COUNTDOWN = {
+    "Sulfuras, Hand of Ragnaros": legendary_sell_in_countdown,
+}
+
+
 class GildedRose:
     def __init__(self, items: list["Item"]):
         self.items = items
 
     def update_quality(self):
         for item in self.items:
-            # reduce sell in
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                item.sell_in = item.sell_in - 1
+            countdown = ITEM_SELL_IN_COUNTDOWN.get(item.name, regular_sell_in_countdown)
+            item.sell_in = countdown(item.sell_in)
 
             decay = ITEM_DECAYS.get(item.name, regular_decay)
             item.quality += decay(item.quality, item.sell_in)
