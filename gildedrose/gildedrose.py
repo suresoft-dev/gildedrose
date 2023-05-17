@@ -15,8 +15,43 @@ Special Items:
 - "Conjured" items degrade in Quality twice as fast as normal items
 """
 
-class GildedRose:
 
+def regular_decay(sell_in: int) -> int:
+    if sell_in < 0:
+        quality_change = -2
+    else:
+        quality_change = -1
+
+    return quality_change
+
+
+def aged_brie_decay(sell_in: int) -> int:
+    if sell_in < 0:
+        quality_change = 2
+    else:
+        quality_change = 1
+
+    return quality_change
+
+
+def backstage_passes_decay(current_quality: int, sell_in: int) -> int:
+    if sell_in < 0:
+        quality_change = -current_quality
+    elif sell_in < 5:
+        quality_change = 3
+    elif sell_in < 10:
+        quality_change = 2
+    else:
+        quality_change = 1
+
+    return quality_change
+
+
+def legendary_decay() -> int:
+    return 0
+
+
+class GildedRose:
     def __init__(self, items: list["Item"]):
         self.items = items
 
@@ -27,27 +62,14 @@ class GildedRose:
                 item.sell_in = item.sell_in - 1
 
             if item.name == "Aged Brie":
-                if item.sell_in < 0:
-                    quality_change = 2
-                else:
-                    quality_change = 1
+                quality_change = aged_brie_decay(item.sell_in)
             elif item.name == "Backstage passes to a TAFKAL80ETC concert":
-                if item.sell_in < 0:
-                    quality_change = -item.quality
-                elif item.sell_in < 5:
-                    quality_change = 3
-                elif item.sell_in < 10:
-                    quality_change = 2
-                else:
-                    quality_change = 1
+                quality_change = backstage_passes_decay(item.quality, item.sell_in)
             elif item.name == "Sulfuras, Hand of Ragnaros":
-                quality_change = 0
+                quality_change = legendary_decay()
             else:
-                if item.sell_in < 0:
-                    quality_change = -2
-                else:
-                    quality_change = -1
-            
+                quality_change = regular_decay(item.sell_in)
+
             item.quality += quality_change
 
             if item.name != "Sulfuras, Hand of Ragnaros":
