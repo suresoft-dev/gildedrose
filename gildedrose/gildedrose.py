@@ -16,8 +16,8 @@ Special Items:
 """
 
 
-from typing import Callable
 from dataclasses import dataclass
+from typing import Callable
 
 
 def regular_countdown(sell_in: int) -> int:
@@ -34,11 +34,8 @@ def regular_decay(current_quality: int, sell_in: int) -> int:
 
 
 def clamp(quality: int) -> int:
-    if quality > 50:
-        quality = 50
-    if quality < 0:
-        quality = 0
-
+    quality = max(0, quality)
+    quality = min(50, quality)
     return quality
 
 
