@@ -87,17 +87,22 @@ ITEM_POLICIES: dict[str, ItemPolicy] = {
 }
 
 
+def get_policy(item_name: str) -> ItemPolicy:
+    if "Conjured" in item_name:
+        policy = ItemPolicy(lambda q, s: regular_decay(q, s) * 2)
+    else:
+        policy = ITEM_POLICIES.get(item_name, ItemPolicy())
+
+    return policy
+
+
 class GildedRose:
     def __init__(self, items: list["Item"]):
         self.items = items
 
     def update_quality(self):
         for item in self.items:
-            if "Conjured" in item.name:
-                policy = ItemPolicy(lambda q, s: regular_decay(q, s) * 2)
-            else:
-                policy = ITEM_POLICIES.get(item.name, ItemPolicy())
-
+            policy = get_policy(item.name)
             sell_in = policy.countdown(item.sell_in)
             quality_change = policy.decay(item.quality, sell_in)
 
